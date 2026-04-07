@@ -32,7 +32,7 @@ RUN locale-gen en_US.UTF-8
 
 WORKDIR /app
 
-COPY src src
+COPY common/ src/
 RUN dos2unix src/* \
     && cp /app/src/install.sh /usr/bin/install \
     && chmod a+x /usr/bin/install \

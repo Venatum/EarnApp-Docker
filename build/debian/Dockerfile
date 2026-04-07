@@ -1,7 +1,7 @@
 FROM debian:bullseye-slim AS builder
 RUN apt-get update && apt-get install --no-install-recommends dos2unix wget -y
 WORKDIR /app
-COPY src src
+COPY common/ src/
 RUN dos2unix src/* && chmod a+x src/*.sh
 RUN bash /app/src/setup.sh
 

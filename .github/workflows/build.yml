@@ -57,7 +57,8 @@ jobs:
 
       - uses: docker/build-push-action@v7
         with:
-          context: build/${{ matrix.variant }}
+          context: build
+          file: build/${{ matrix.variant }}/Dockerfile
           push: true
           platforms: ${{ matrix.platforms }}
           tags: ${{ matrix.tags }}

@@ -12,11 +12,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY src src
+COPY common/setup.sh src/setup.sh
+COPY lite/src/install.sh src/install.sh
 RUN dos2unix src/* \
     && cp /app/src/install.sh /usr/bin/install \
-    && cp /app/src/myip.sh /usr/bin/myip \
-    && chmod a+x /usr/bin/install /usr/bin/myip
+    && chmod a+x /usr/bin/install
 
 RUN bash /app/src/setup.sh && rm -r /app/src
 
@@ -24,4 +24,4 @@ VOLUME [ "/etc/earnapp" ]
 
 CMD ["install"]
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=10s --retries=2 CMD myip && cat /etc/earnapp/status | grep enabled && exit 0 || exit 1
+HEALTHCHECK --interval=1m --timeout=10s --start-period=10s --retries=2 CMD cat /etc/earnapp/status | grep enabled && exit 0 || exit 1

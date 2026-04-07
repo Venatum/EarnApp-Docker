@@ -1,7 +1,9 @@
 version: "3.3"
 services:
   app:
-    build: build/debian
+    build:
+      context: build
+      dockerfile: debian/Dockerfile
     image: venatum/earnapp:debian
     privileged: true
     volumes:
