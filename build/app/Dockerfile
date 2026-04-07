@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
-LABEL maintainer="Mohamed Farhan Fazal"
-LABEL org.opencontainers.image.authors="admin@ffehost.com"
+LABEL maintainer="Venatum"
+LABEL org.opencontainers.image.authors="Venatum"
 
 ENV container=docker
 ENV DEBIAN_FRONTEND=noninteractive

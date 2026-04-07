@@ -8,8 +8,8 @@ RUN bash /app/src/setup.sh
 
 FROM debian:bullseye-slim AS earnapp
 
-LABEL maintainer="Mohamed Farhan Fazal"
-LABEL org.opencontainers.image.authors="admin@ffehost.com"
+LABEL maintainer="Venatum"
+LABEL org.opencontainers.image.authors="Venatum"
 
 ENV container=docker
 ENV DEBIAN_FRONTEND=noninteractive

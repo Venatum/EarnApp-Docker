@@ -1,63 +1,79 @@
 # EarnApp Docker
-### Docker Image for [EarnApp](https://earnapp.com)
 
-## Clone
-```BASH
-git clone https://github.com/fazalfarhan01/earnapp_docker.git
-```
+### Unofficial Docker Image for [EarnApp](https://earnapp.com)
+
+> **Note:** This is an unofficial build and comes with no warranty of any kind.
+> By using this image you also agree to BrightData's terms and conditions.
+
+Supports **amd64**, **ARM64** and **ARMv7** (including Docker on Windows/WSL).
+
+## Support
+
+If you don't have an EarnApp account yet, you can support this project by signing up through my [referral link](https://earnapp.com/i/r23y2mk). It doesn't change anything for you but it helps me earn a small percentage. [How does the referral program work?](https://help.earnapp.com/hc/en-us/articles/10232037405073-How-does-the-referral-program-work)
 
 ## Available Tags
-1. `latest` - Built and updated daily
-2. `hourly-latest` - Built and updated every hour at UTC 10th minute.
-3. `lite` - Use when you have problems with regular version.
-**Note**: `lite` version cannot generate it's own UUID and the same has to be provided as an environment variable.
 
-## How to:
-### _Non Compose_
-1. Make a directory for earnapp data
-    - `mkdir $HOME/earnapp-data`
-2. Run the container
-    - `docker run -d --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v $HOME/earnapp-data:/etc/earnapp --name earnapp fazalfarhan01/earnapp`
-    
-    or if you are using the `lite` version
-    - `docker run -d -e EARNAPP_UUID='sdk-node-XXXXXXXXXXXXXXXXXXX'  --name earnapp fazalfarhan01/earnapp:lite`
-3. Get the UUID
-    - `docker exec -it earnapp showid`
-4. Copy and paste the app `UUID` in the [EarnApp Dashboard](https://earnapp.com/dashboard) 
+| Tag | Description | Update frequency |
+|-----|-------------|-----------------|
+| `latest` | Standard image (systemd) | Daily |
+| `hourly-latest` | Same as latest | Hourly |
+| `lite` | Non-systemd, requires an existing UUID | Daily |
 
-### Compose
-1. Make a new directory, create a file named `docker-compose.yml` and paste the following into it.
-```YML
-version: '3.3'
-services:
-    app:
-        image: fazalfarhan01/earnapp
-        privileged: true
-        volumes:
-            - /sys/fs/cgroup:/sys/fs/cgroup:ro
-            - ./etc:/etc/earnapp
+## Quick Start
+
+### Docker Run
+
+```bash
+mkdir $HOME/earnapp-data
+
+docker run -d --privileged \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  -v $HOME/earnapp-data:/etc/earnapp \
+  --name earnapp venatum/earnapp
 ```
 
-Use the `lite` version if you don't want to run the container priviledged or having any of the issues [here](https://github.com/fazalfarhan01/EarnApp-Docker/issues/2).
+Get your UUID and register it on the [EarnApp Dashboard](https://earnapp.com/dashboard):
 
-```YML
-version: '3.3'
-services:
-    app:
-        image: fazalfarhan01/earnapp:lite
-        environment:
-            EARNAPP_UUID: YOUR_NODE_ID_HERE
+```bash
+docker exec -it earnapp earnapp showid
 ```
 
-2. Run `docker-compose up -d`
+### Docker Compose
 
-3. You can access the earnapp cli using the command
-    ```BASH
-    docker-compose exec app earnapp <YOUR COMMAND GOES HERE>
-    ```
+```yml
+version: "3.3"
+services:
+  app:
+    image: venatum/earnapp
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./etc:/etc/earnapp
+```
 
-## Like my work?
-Consider donating.
-- BTC: 1PdUFXmVUxy88NRPJ2RFuhyjUqMiJyZybR
-- ETH: 0x715810d3619b6831b3d4ff0465ec3523aceb20c6
-- PayPal: [@fazalfarhan01](https://www.paypal.me/fazalfarhan01)
+```bash
+docker-compose up -d
+docker-compose exec app earnapp showid
+```
+
+### Lite Version
+
+Use `lite` if you don't want to run the container privileged or encounter [systemd issues](https://github.com/venatum/EarnApp-Docker/issues/2). You must provide your own UUID.
+
+**Docker Run:**
+
+```bash
+docker run -d -e EARNAPP_UUID='sdk-node-XXXXXXXXXXXXXXXXXXX' \
+  --name earnapp venatum/earnapp:lite
+```
+
+**Docker Compose:**
+
+```yml
+version: "3.3"
+services:
+  app:
+    image: venatum/earnapp:lite
+    environment:
+      EARNAPP_UUID: YOUR_NODE_ID_HERE
+```
