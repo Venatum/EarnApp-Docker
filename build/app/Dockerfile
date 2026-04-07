@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     software-properties-common systemd systemd-cron \
-    wget dos2unix libatomic1 \
+    wget curl dos2unix libatomic1 ca-certificates \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
     && rm -rf /tmp/* /var/tmp/* \
@@ -24,19 +24,21 @@ RUN apt-get update \
     && rm -f /lib/systemd/system/systemd-update-utmp* \
     && apt-get clean
 
+RUN curl -sfL https://brightdata.com/static/earnapp/install.sh | bash -s install
+
 WORKDIR /app
 
-COPY common/ src/
-RUN dos2unix src/* \
+COPY common/install.sh /app/src/install.sh
+COPY common/myip.sh /app/src/myip.sh
+COPY common/installer.service /app/src/installer.service
+RUN dos2unix /app/src/* \
     && cp /app/src/install.sh /usr/bin/install \
     && chmod a+x /usr/bin/install \
     && cp /app/src/myip.sh /usr/bin/myip \
-    && chmod a+x /usr/bin/myip
-
-RUN cp /app/src/installer.service /etc/systemd/system/installer.service \
-    && systemctl enable installer.service
-
-RUN bash /app/src/setup.sh && rm -r /app/src
+    && chmod a+x /usr/bin/myip \
+    && cp /app/src/installer.service /etc/systemd/system/installer.service \
+    && systemctl enable installer.service \
+    && rm -r /app/src
 
 VOLUME [ "/etc/earnapp" ]
 VOLUME ["/sys/fs/cgroup"]

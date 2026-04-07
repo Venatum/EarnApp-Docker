@@ -16,9 +16,7 @@ jobs:
       - name: Get EarnApp version
         id: version
         run: |
-          wget -cq https://brightdata.com/static/earnapp/bin_64 -O ./earnapp
-          chmod a+x ./earnapp
-          VERSION=$(./earnapp --version | tr -cd '[:print:]' | tr -d '[:space:]')
+          VERSION=$(curl -sfL https://brightdata.com/static/earnapp/install.sh | grep -oP '^VERSION="\K[^"]+')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build:
