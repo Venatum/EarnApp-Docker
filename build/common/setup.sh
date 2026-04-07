@@ -17,6 +17,5 @@ else
     file=armv7
 fi
 mkdir /download
-wget -cq --no-check-certificate https://brightdata.com/static/earnapp/$file -O /download/earnapp
-echo | md5sum /download/earnapp
+wget -cq https://brightdata.com/static/earnapp/$file -O /download/earnapp
 chmod +x /download/earnapp

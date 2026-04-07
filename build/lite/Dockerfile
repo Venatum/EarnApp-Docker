@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 LABEL maintainer="Venatum"
 LABEL org.opencontainers.image.authors="Venatum"
@@ -7,7 +7,8 @@ ENV container=docker
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-    && apt-get install -y wget dos2unix iputils-ping net-tools htop libatomic1 \
+    && apt-get install -y --no-install-recommends wget dos2unix libatomic1 \
+    && rm -Rf /var/lib/apt/lists/* \
     && apt-get clean
 
 WORKDIR /app

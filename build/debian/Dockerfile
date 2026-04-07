@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim AS builder
+FROM debian:bookworm-slim AS builder
 RUN apt-get update && apt-get install --no-install-recommends dos2unix wget -y
 WORKDIR /app
 COPY common/ src/
@@ -6,7 +6,7 @@ RUN dos2unix src/* && chmod a+x src/*.sh
 RUN bash /app/src/setup.sh
 
 
-FROM debian:bullseye-slim AS earnapp
+FROM debian:bookworm-slim AS earnapp
 
 LABEL maintainer="Venatum"
 LABEL org.opencontainers.image.authors="Venatum"

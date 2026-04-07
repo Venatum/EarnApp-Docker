@@ -16,7 +16,6 @@ If you don't have an EarnApp account yet, you can support this project by signin
 | Tag | Description | Update frequency |
 |-----|-------------|-----------------|
 | `latest` | Standard image (systemd) | Daily |
-| `hourly-latest` | Same as latest | Hourly |
 | `lite` | Non-systemd, requires an existing UUID | Daily |
 
 ## Quick Start
