@@ -13,10 +13,10 @@ If you don't have an EarnApp account yet, you can support this project by signin
 
 ## Available Tags
 
-| Tag | Description | Update frequency |
-|-----|-------------|-----------------|
-| `latest` | Standard image (systemd) | Daily |
-| `lite` | Non-systemd, requires an existing UUID | Daily |
+| Tag      | Description                            | Update frequency |
+|----------|----------------------------------------|------------------|
+| `latest` | Standard image (systemd)               | Daily            |
+| `lite`   | Non-systemd, requires an existing UUID | Daily            |
 
 ## Quick Start
 
@@ -25,8 +25,8 @@ If you don't have an EarnApp account yet, you can support this project by signin
 ```bash
 mkdir $HOME/earnapp-data
 
-docker run -d --privileged \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+docker run -d --privileged --cgroupns=host \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
   -v $HOME/earnapp-data:/etc/earnapp \
   --name earnapp venatum/earnapp
 ```
@@ -40,13 +40,13 @@ docker exec -it earnapp earnapp showid
 ### Docker Compose
 
 ```yml
-version: "3.3"
 services:
   app:
     image: venatum/earnapp
     privileged: true
+    cgroupns: host
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - ./etc:/etc/earnapp
 ```
 
@@ -69,7 +69,6 @@ docker run -d -e EARNAPP_UUID='sdk-node-XXXXXXXXXXXXXXXXXXX' \
 **Docker Compose:**
 
 ```yml
-version: "3.3"
 services:
   app:
     image: venatum/earnapp:lite

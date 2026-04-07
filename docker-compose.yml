@@ -6,6 +6,7 @@ services:
       dockerfile: debian/Dockerfile
     image: venatum/earnapp:debian
     privileged: true
+    cgroup_parent: ""
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - ./etc:/etc/earnapp
