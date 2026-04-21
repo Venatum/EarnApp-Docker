@@ -5,7 +5,7 @@ on:
   push:
     branches: [master]
   schedule:
-    - cron: "0 8 * * 1" # Monday at 8:00 UTC
+    - cron: "0 1 * * 1" # Monday at 8:00 UTC
 
 jobs:
   version:
