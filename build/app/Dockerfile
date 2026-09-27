@@ -1,4 +1,6 @@
-FROM ubuntu:24.04
+# Base image: ubuntu:24.04 (tag `latest`) or debian:trixie-slim (tag `debian`)
+ARG BASE_IMAGE=ubuntu:24.04
+FROM ${BASE_IMAGE}
 
 LABEL maintainer="Venatum"
 LABEL org.opencontainers.image.authors="Venatum"
@@ -8,8 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    software-properties-common systemd systemd-cron \
-    wget curl dos2unix libatomic1 ca-certificates \
+    systemd systemd-sysv wget curl libatomic1 ca-certificates \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
     && rm -rf /tmp/* /var/tmp/* \
@@ -24,23 +25,17 @@ RUN apt-get update \
     && rm -f /lib/systemd/system/systemd-update-utmp* \
     && apt-get clean
 
-RUN curl -sfL https://brightdata.com/static/earnapp/install.sh | bash -s install
+# Expected EarnApp version (empty: whatever BrightData currently serves). Also part of the layer
+# cache key, so a new release is never served from cache.
+ARG EARNAPP_VERSION=
+RUN --mount=type=bind,source=common/fetch-earnapp.sh,target=/fetch-earnapp.sh \
+    bash /fetch-earnapp.sh "$EARNAPP_VERSION"
 
-WORKDIR /app
-
-COPY common/install.sh /app/src/install.sh
-COPY common/myip.sh /app/src/myip.sh
-COPY common/installer.service /app/src/installer.service
-RUN dos2unix /app/src/* \
-    && cp /app/src/install.sh /usr/bin/install \
-    && chmod a+x /usr/bin/install \
-    && cp /app/src/myip.sh /usr/bin/myip \
-    && chmod a+x /usr/bin/myip \
-    && cp /app/src/installer.service /etc/systemd/system/installer.service \
-    && systemctl enable installer.service \
-    && rm -r /app/src
+COPY --chmod=755 common/install.sh /usr/local/bin/earnapp-setup
+COPY --chmod=755 common/myip.sh /usr/bin/myip
+COPY common/installer.service /etc/systemd/system/installer.service
+RUN systemctl enable installer.service
 
 VOLUME [ "/etc/earnapp" ]
-VOLUME ["/sys/fs/cgroup"]
 
 CMD ["/sbin/init"]

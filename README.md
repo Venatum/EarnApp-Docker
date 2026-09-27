@@ -15,8 +15,9 @@ If you don't have an EarnApp account yet, you can support this project by signin
 
 | Tag      | Description                            | Update frequency |
 |----------|----------------------------------------|------------------|
-| `latest` | Standard image (systemd)               | Daily            |
-| `lite`   | Non-systemd, requires an existing UUID | Daily            |
+| `latest` | Standard image (systemd, Ubuntu)       | Weekly           |
+| `debian` | Standard image (systemd, Debian)       | Weekly           |
+| `lite`   | Non-systemd, requires an existing UUID | Weekly           |
 
 ## Quick Start
 
@@ -31,7 +32,7 @@ docker run -d --privileged --cgroupns=host \
   --name earnapp venatum/earnapp
 ```
 
-Get your UUID and register it on the [EarnApp Dashboard](https://earnapp.com/dashboard):
+The UUID is generated on first start and stored in the `/etc/earnapp` volume, so it survives restarts and container recreation as long as you keep that volume. Get it and link the device to your account by opening `https://earnapp.com/r/<your-uuid>` while logged in:
 
 ```bash
 docker exec -it earnapp earnapp showid
@@ -44,7 +45,7 @@ services:
   app:
     image: venatum/earnapp
     privileged: true
-    cgroupns: host
+    cgroup: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - ./etc:/etc/earnapp
@@ -59,10 +60,18 @@ docker-compose exec app earnapp showid
 
 Use `lite` if you don't want to run the container privileged or encounter [systemd issues](https://github.com/venatum/EarnApp-Docker/issues/2). You must provide your own UUID.
 
+**Get a UUID** — either reuse the full id of an existing device (`earnapp showid`; the dashboard only shows a shortened one), or generate a new one:
+
+```bash
+echo "sdk-node-$(openssl rand -hex 16)"
+```
+
+Use one UUID per container: two devices sharing an id are seen as a single one. Once the container is running, link it to your account by opening `https://earnapp.com/r/<your-uuid>` while logged in.
+
 **Docker Run:**
 
 ```bash
-docker run -d -e EARNAPP_UUID='sdk-node-XXXXXXXXXXXXXXXXXXX' \
+docker run -d -e EARNAPP_UUID='sdk-node-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' \
   --name earnapp venatum/earnapp:lite
 ```
 
@@ -73,5 +82,5 @@ services:
   app:
     image: venatum/earnapp:lite
     environment:
-      EARNAPP_UUID: YOUR_NODE_ID_HERE
+      EARNAPP_UUID: sdk-node-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```

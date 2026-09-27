@@ -12,4 +12,6 @@ echo "Installing"
 chmod a+wr /etc/earnapp/
 touch /etc/earnapp/status
 chmod a+wr /etc/earnapp/status
-earnapp install
+# `earnapp install` moves its own executable to /usr/bin/earnapp, so it must run from a copy
+cp /usr/bin/earnapp /tmp/earnapp_setup
+/tmp/earnapp_setup install --auto
