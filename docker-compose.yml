@@ -1,12 +1,13 @@
-version: "3.3"
 services:
   app:
     build:
       context: build
-      dockerfile: debian/Dockerfile
+      dockerfile: app/Dockerfile
+      args:
+        BASE_IMAGE: debian:trixie-slim
     image: venatum/earnapp:debian
     privileged: true
-    cgroup_parent: ""
+    cgroup: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - ./etc:/etc/earnapp

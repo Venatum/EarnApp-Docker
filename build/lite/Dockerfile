@@ -11,16 +11,16 @@ RUN apt-get update \
     && rm -Rf /var/lib/apt/lists/* \
     && apt-get clean
 
-RUN curl -sfL https://brightdata.com/static/earnapp/install.sh -o /tmp/install.sh \
-    && bash /tmp/install.sh -y || true \
-    && rm -f /tmp/install.sh \
-    && test -x /usr/bin/earnapp
+# Expected EarnApp version (empty: whatever BrightData currently serves). Also part of the layer
+# cache key, so a new release is never served from cache.
+ARG EARNAPP_VERSION=
+RUN --mount=type=bind,source=common/fetch-earnapp.sh,target=/fetch-earnapp.sh \
+    bash /fetch-earnapp.sh "$EARNAPP_VERSION"
 
-COPY lite/src/entrypoint.sh /usr/bin/entrypoint
-RUN chmod a+x /usr/bin/entrypoint
+COPY --chmod=755 lite/src/entrypoint.sh /usr/bin/entrypoint
 
 VOLUME [ "/etc/earnapp" ]
 
 ENTRYPOINT ["entrypoint"]
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=10s --retries=2 CMD cat /etc/earnapp/status | grep enabled && exit 0 || exit 1
+HEALTHCHECK --interval=1m --timeout=10s --start-period=10s --retries=2 CMD ["grep", "-q", "enabled", "/etc/earnapp/status"]

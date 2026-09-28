@@ -6,21 +6,26 @@
 
 ### `build.yml`
 
-Triggers: `push` on master, daily cron (`3:10 UTC`), manual dispatch.
+Triggers: `push` on master, `pull_request` (test only, nothing is pushed), weekly cron (Monday `1:00 UTC`), manual dispatch.
 
 | Job | Description |
 |-----|-------------|
-| `version` | Downloads EarnApp binary and extracts the version string |
-| `build` | Builds & pushes 3 variants in parallel via matrix |
-| `update-readme` | Syncs `README.md` to Docker Hub description |
+| `version` | Extracts the EarnApp version from BrightData's install script |
+| `build` | Per variant (matrix): builds amd64 and runs `tests/smoke.sh` on it, then — except on PRs — builds all platforms from the same cache and pushes them |
+| `update-readme` | Syncs `README.md` to Docker Hub description (currently disabled) |
+
+The version is passed as the `EARNAPP_VERSION` build arg: `build/common/fetch-earnapp.sh` fails the build if BrightData serves another version, and it keys the layer cache (`type=gha`, one scope per variant) so a new release is never served from cache.
+
+Run the same smoke tests locally with `make test-all` (or `make test-lite`, ...).
+To dry-run the `build` job against a private registry: `make test-registry REGISTRY=host:5000 BUILDER=<buildx builder> [VARIANTS=lite] [PLATFORMS=linux/arm64]`.
 
 ### Build matrix
 
-| Variant | Tags | Platforms |
-|---------|------|-----------|
-| `app` | `latest`, `<version>` | amd64, arm/v7, arm64 |
-| `lite` | `lite`, `lite-<version>` | amd64, arm/v7, arm64 |
-| `debian` | `debian`, `debian-<version>` | amd64, arm/v7, arm/v6, arm64 |
+| Variant | Dockerfile | Tags | Platforms |
+|---------|------------|------|-----------|
+| `app` | `build/app` (ubuntu:24.04) | `latest`, `<version>` | amd64, arm/v7, arm64 |
+| `lite` | `build/lite` (ubuntu:24.04) | `lite`, `lite-<version>` | amd64, arm/v7, arm64 |
+| `debian` | `build/app` + `BASE_IMAGE=debian:trixie-slim` | `debian`, `debian-<version>` | amd64, arm/v7, arm64 |
 
 ## Dependencies
 
