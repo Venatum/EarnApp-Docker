@@ -48,8 +48,7 @@ To dry-run the `build` job against a private registry: `make test-registry REGIS
 
 | Secret | Usage |
 |--------|-------|
-| `DOCKER_USER` | Docker Hub username |
-| `DOCKER_PASSWORD` | Docker Hub PAT (Personal Access Token) |
+| `DOCKERHUB_TOKEN` | Docker Hub PAT (Personal Access Token, Read & Write) of the `venatum` account |
 
 ## Runners
 
