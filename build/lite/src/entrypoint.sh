@@ -14,6 +14,10 @@ echo -n "$EARNAPP_UUID" > "$CONFIG_DIR/uuid"
 touch "$CONFIG_DIR/status"
 chmod a+wr "$CONFIG_DIR/status"
 
+# EARNAPP_VERBOSE=true: `earnapp run` also logs registration and full error traces
+run_args=(run)
+[[ "${EARNAPP_VERBOSE:-false}" == true ]] && run_args+=(--verbose)
+
 # Bash is PID 1: it only handles SIGTERM between foreground commands, so long-running
 # commands run in the background and are awaited, letting `docker stop` exit cleanly.
 child=""
@@ -44,7 +48,7 @@ while true; do
     sleep 2
 
     start_time=$(date +%s)
-    run_child "$BIN_PATH" run
+    run_child "$BIN_PATH" "${run_args[@]}"
     run_duration=$(( $(date +%s) - start_time ))
 
     if [[ $run_duration -gt 60 ]]; then

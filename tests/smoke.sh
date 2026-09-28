@@ -82,6 +82,24 @@ if [[ "$VARIANT" == "lite" ]]; then
     check "backs off between crashes" \
         bash -c "docker logs ${PREFIX}-crash 2>&1 | grep -q 'backing off'"
     rm -f "$crashing_bin"
+
+    # Replace the binary with one that records its arguments: EARNAPP_VERBOSE adds --verbose to `run`.
+    recording_bin=$(mktemp)
+    # shellcheck disable=SC2016  # $* and $1 belong to the fake binary, not to this script
+    printf '#!/bin/sh\necho "$*" >> /tmp/earnapp-calls\n[ "$1" = run ] && exec sleep 60\nexit 0\n' > "$recording_bin"
+    chmod a+rx "$recording_bin"
+    for verbose in true unset; do
+        env_args=(-e EARNAPP_UUID="$uuid")
+        [[ "$verbose" == true ]] && env_args+=(-e EARNAPP_VERBOSE=true)
+        docker run -d --name "${PREFIX}-verbose-$verbose" "${env_args[@]}" \
+            -v "$recording_bin:/usr/bin/earnapp:ro" "$IMAGE" > /dev/null
+    done
+    sleep 6
+    check "EARNAPP_VERBOSE=true runs earnapp run --verbose" \
+        docker exec "${PREFIX}-verbose-true" grep -qx 'run --verbose' /tmp/earnapp-calls
+    check "earnapp run is not verbose by default" \
+        docker exec "${PREFIX}-verbose-unset" grep -qx 'run' /tmp/earnapp-calls
+    rm -f "$recording_bin"
 else
     echo "== Runtime checks ($VARIANT, systemd)"
 

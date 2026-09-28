@@ -84,3 +84,10 @@ services:
     environment:
       EARNAPP_UUID: sdk-node-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
+
+**Environment variables:**
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `EARNAPP_UUID` | yes | Device id, see *Get a UUID* above. |
+| `EARNAPP_VERBOSE` | no | `true` runs `earnapp run --verbose`: it also logs the device registration and full error traces (useful to debug connection issues). EarnApp never logs its traffic to the console, verbose or not. |
